@@ -21,7 +21,7 @@
 
 ##Решение
 
-Первым делом в отладчике нашел такую ошибку: worker.js:36 Uncaught SyntaxError: missing ) after argument list``` . Удаляю двоеточие.
+Первым делом в отладчике нашел такую ошибку: `worker.js:36 Uncaught SyntaxError: missing ) after argument list` . Удаляю двоеточие.
 
     getFromCache(event.request).catch(fetchAndPutToCache);
 
@@ -55,7 +55,7 @@
       '/js/index.js'
     ];
 
-На строчке 37 метод fetchAndPutToCache() ожидает в качестве аргумента объект запроса. Меняем
+На строчке 37 метод `fetchAndPutToCache()` ожидает в качестве аргумента объект запроса. Меняем
 
     getFromCache(event.request).catch(fetchAndPutToCache)
 
@@ -63,7 +63,7 @@
 
     getFromCache(event.request).catch(fetchAndPutToCache.bind(this, event.request))
 
-Также конструкция на 28-31 Promise.([]) довольно странная. Она делает запрос данных на сервер, кладет их в кеш и сразу же их отдает.
+Также конструкция на 28-31 `Promise.([...])` довольно странная. Она делает запрос данных на сервер, кладет их в кеш и сразу же их отдает.
 
 Заменил
 
