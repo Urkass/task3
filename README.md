@@ -18,3 +18,60 @@
 ##Что мы проверяем этим заданием?
 
 Мы хотим проверить вашу способность разобраться в незнакомом коде и/или API. Также с помощью этого задания мы оценим ваш навык отладки. Поэтому прокомментируйте, пожалуйста, в коде или текстовом файле README ход ваших мыслей — какие ошибки и как вы нашли, почему они возникли и какие способы исправления существуют. Мы не ограничиваем вас в использовании сторонних инструментов и библиотек, однако при их использовании также ожидаем комментариев, в которых вы расскажете, зачем и почему было использовано то или иное средство.
+
+##Решение
+
+Первым делом в отладчике нашел такую ошибку: worker.js:36 Uncaught SyntaxError: missing ) after argument list``` . Удаляю двоеточие.
+
+    getFromCache(event.request).catch(fetchAndPutToCache);
+
+    на
+
+    getFromCache(event.request).catch(fetchAndPutToCache)
+
+Затем нашел, что пути неправильно написаны, service worker регистрируется неккоректно, файл worker.js должен располагаться в корне директории.
+
+В index.html изменил 17 строчку
+
+    navigator.serviceWorker.register('/js/worker.js');
+
+на
+
+    navigator.serviceWorker.register('/worker.js');
+
+В worker.js изменил строчки 3-7
+
+    var urlsToCache = [
+      '/',
+      '/index.css',
+      '/index.js'
+    ];
+
+на
+
+    var urlsToCache = [
+      '/',
+      '/css/index.css',
+      '/js/index.js'
+    ];
+
+На строчке 37 метод fetchAndPutToCache() ожидает в качестве аргумента объект запроса. Меняем
+
+    getFromCache(event.request).catch(fetchAndPutToCache)
+
+на
+
+    getFromCache(event.request).catch(fetchAndPutToCache.bind(this, event.request))
+
+Также конструкция на 28-31 Promise.([]) довольно странная. Она делает запрос данных на сервер, кладет их в кеш и сразу же их отдает.
+
+Заменил
+
+    Promise.race([
+                    fetchAndPutToCache(event.request),
+                    getFromCache(event.request)
+                ])
+
+на
+
+    fetchAndPutToCache(event.request)
